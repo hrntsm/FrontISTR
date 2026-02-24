@@ -16,6 +16,7 @@
 //   --E0 <v>            Base Young's modulus for solid (default: 1.0)
 //   --Emin <v>          Minimum Young's modulus for void (default: 1e-9)
 //   --nu <v>            Poisson's ratio (default: 0.3)
+//   --stl-res <n>       Voxel grid resolution for STL export (default: 64, 0=disable)
 //   --preprocess        Only preprocess .msh to add per-element groups, then exit
 //   --gen-mesh <nx> <ny> Generate a cantilever test mesh and exit (or continue)
 
@@ -33,7 +34,7 @@ class Program
         string fistrExe = "fistr1";
         double volFrac = 0.5, penal = 3.0, rMin = 1.5;
         double E0 = 1.0, Emin = 1e-9, nu = 0.3;
-        int maxIter = 100;
+        int maxIter = 100, stlRes = 64;
         bool genMesh = false, preprocessOnly = false;
         int genNx = 0, genNy = 0;
 
@@ -52,6 +53,7 @@ class Program
                 case "--E0":         E0          = double.Parse(args[++i]); break;
                 case "--Emin":       Emin        = double.Parse(args[++i]); break;
                 case "--nu":         nu          = double.Parse(args[++i]); break;
+                case "--stl-res":    stlRes      = int.Parse(args[++i]);   break;
                 case "--preprocess": preprocessOnly = true; break;
                 case "--gen-mesh":
                     genMesh = true;
@@ -236,6 +238,15 @@ class Program
         Console.WriteLine($"\nFinal density written to: {densityFile}");
         Console.WriteLine("Elements with rho > 0.5 form the structural skeleton.");
 
+        // ── Write STL via Marching Cubes ──────────────────────────────────
+        if (stlRes > 0)
+        {
+            string stlFile = Path.Combine(workDir, resPrefix + "_topo.stl");
+            Console.WriteLine($"\nExtracting isosurface (isovalue=0.5, grid={stlRes})...");
+            StlWriter.WriteStl(stlFile, mesh, rho, isovalue: 0.5, gridRes: stlRes);
+            Console.WriteLine($"STL written to: {stlFile}");
+        }
+
         return 0;
     }
 
@@ -274,6 +285,7 @@ Options:
   --E0 <v>         Solid Young's modulus (default: 1.0)
   --Emin <v>       Void Young's modulus (default: 1e-9)
   --nu <v>         Poisson's ratio (default: 0.3)
+  --stl-res <n>    Marching Cubes voxel resolution (default: 64, 0=disable STL)
 """);
         return 1;
     }
