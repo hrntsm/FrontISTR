@@ -1,0 +1,10 @@
+#
+# hecmw_ctrl.dat - auto-overwritten each iteration by TopOpt
+# Initial template for cantilever topology optimization
+#
+!MESH, NAME=fstrMSH, TYPE=HECMW-ENTIRE
+ cantilever.msh
+!CONTROL, NAME=fstrCNT
+ cantilever_work.cnt
+!RESULT, NAME=fstrRES, IO=OUT
+ cantilever.res
