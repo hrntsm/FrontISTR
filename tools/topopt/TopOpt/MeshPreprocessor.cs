@@ -200,32 +200,7 @@ public static class MeshPreprocessor
         var originalLines = File.ReadAllLines(inputMsh);
         var sb = new StringBuilder();
 
-        // Copy everything up to the first !ELEMENT or !SECTION line (keep header + nodes)
-        bool inElementOrSection = false;
-        foreach (var raw in originalLines)
-        {
-            var line = raw.Trim().ToUpperInvariant();
-            if (line.StartsWith("!ELEMENT") || line.StartsWith("!SECTION"))
-            {
-                inElementOrSection = true;
-                continue;
-            }
-            if (line.StartsWith("!MATERIAL") || line.StartsWith("!END"))
-            {
-                inElementOrSection = false;
-            }
-            if (!inElementOrSection)
-            {
-                // Skip original ELEMENT/SECTION/MATERIAL data lines
-                if (inElementOrSection) continue;
-                // Check if this is a data line after a skipped section
-                sb.AppendLine(raw);
-            }
-        }
-
-        // Actually, let's do a cleaner line-by-line approach
-        sb.Clear();
-        string currentSection = "";
+        // Copy non-ELEMENT/SECTION/MATERIAL lines (header, nodes, node groups)
         bool skipLines = false;
 
         foreach (var raw in originalLines)
@@ -234,7 +209,6 @@ public static class MeshPreprocessor
             if (trimmed.StartsWith("!"))
             {
                 var kw = trimmed.Split(',')[0].Trim().ToUpperInvariant();
-                currentSection = kw;
                 skipLines = kw is "!ELEMENT" or "!SECTION" or "!MATERIAL";
                 if (!skipLines) sb.AppendLine(raw);
             }

@@ -152,8 +152,6 @@ class Program
         Console.WriteLine($"{"Iter",4}  {"Compliance",14}  {"Change",10}  {"VolFrac",8}");
         Console.WriteLine(new string('-', 45));
 
-        double prevCompliance = double.MaxValue;
-
         // ── Optimization loop ─────────────────────────────────────────────
         for (int iter = 1; iter <= maxIter; iter++)
         {
@@ -225,7 +223,6 @@ class Program
                 break;
             }
 
-            prevCompliance = compliance;
         }
 
         // ── Write final density field ─────────────────────────────────────
